@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useActions } from '../../services/state/store.js';
+import PriceRatingBadge from '../../components/PriceRatingBadge.jsx';
 import {
   Typography,
   Button,
@@ -33,6 +34,9 @@ import {
   IconStarStroked,
   IconExpand,
   IconGridView,
+  IconNoteMoney,
+  IconHome,
+  IconPercentage,
 } from '@douyinfe/semi-icons';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -54,6 +58,7 @@ export default function ListingDetail() {
   const navigate = useNavigate();
   const actions = useActions();
   const listing = useSelector((state) => state.listingsData.currentListing);
+  const jobs = useSelector((state) => state.jobsData.jobs);
   const homeAddress = useSelector((state) => state.userSettings.settings.home_address);
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -262,6 +267,26 @@ export default function ListingDetail() {
   const data = [
     { key: 'Price', value: `${listing.price} €`, Icon: <IconCart /> },
     {
+      key: 'NK (12,07%)',
+      value: listing.price > 0 ? `${Math.round(listing.price * 0.1207).toLocaleString('de-DE')} €` : 'N/A',
+      Icon: <IconNoteMoney />,
+    },
+    {
+      key: 'Price per m²',
+      value: (() => {
+        if (!listing.price || !(listing.size > 0)) return 'N/A';
+        const pricePerSqm = Math.round(listing.price / listing.size);
+        const specFilter = jobs.find((j) => j.id === listing.job_id)?.specFilter;
+        return (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            {pricePerSqm.toLocaleString('de-DE')} €/m²
+            <PriceRatingBadge pricePerSqm={pricePerSqm} specFilter={specFilter} />
+          </span>
+        );
+      })(),
+      Icon: <IconCart />,
+    },
+    {
       key: 'Size',
       value: listing.size ? `${listing.size} m²` : 'N/A',
       Icon: <IconExpand />,
@@ -321,9 +346,14 @@ export default function ListingDetail() {
             >
               {listing.isWatched === 1 ? 'Watched' : 'Watch'}
             </Button>
-            <Text link={{ href: listing.link, target: '_blank' }} icon={<IconLink />} underline>
-              Open listing
-            </Text>
+            {[
+              { provider: listing.provider, link: listing.link },
+              ...(listing.additional_sources ? JSON.parse(listing.additional_sources) : []),
+            ].map((src, i) => (
+              <Text key={i} link={{ href: src.link, target: '_blank' }} icon={<IconLink />} underline>
+                {src.provider.charAt(0).toUpperCase() + src.provider.slice(1)}
+              </Text>
+            ))}
           </Space>
         </div>
 
@@ -353,6 +383,54 @@ export default function ListingDetail() {
                   </Descriptions.Item>
                 ))}
               </Descriptions>
+              {(() => {
+                const spec = jobs.find((j) => j.id === listing.job_id)?.specFilter;
+                const rental = spec?.rentalPricePerSqm;
+                const fq = spec?.finanzierungsquotient;
+                if (!rental || !listing.size) return null;
+                const mieteinnahmen = Math.round(listing.size * rental);
+                const roiJahre = listing.price > 0 ? (listing.price / (mieteinnahmen * 12)).toFixed(1) : null;
+                const rate = fq && listing.price > 0 ? Math.round((listing.price * (fq / 100)) / 12) : null;
+                return (
+                  <>
+                    <Divider margin="1.5rem" />
+                    <Title heading={4} style={{ marginBottom: '1rem' }}>
+                      Rendite & Finanzierung
+                    </Title>
+                    <div className="listing-detail__rendite">
+                      <div className="listing-detail__renditeRow">
+                        <IconHome style={{ flexShrink: 0, color: 'var(--semi-color-text-2)' }} />
+                        <div>
+                          <div className="listing-detail__renditeValue">
+                            {mieteinnahmen.toLocaleString('de-DE')} € <sup>/ Monat</sup>
+                          </div>
+                          <div className="listing-detail__renditeLabel">Mieteinnahmen</div>
+                        </div>
+                      </div>
+                      {roiJahre && (
+                        <div className="listing-detail__renditeRow">
+                          <IconHome style={{ flexShrink: 0, color: 'var(--semi-color-text-2)' }} />
+                          <div>
+                            <div className="listing-detail__renditeValue">{roiJahre} Jahre</div>
+                            <div className="listing-detail__renditeLabel">ROI (Kaufpreis ÷ Jahresmieteinnahmen)</div>
+                          </div>
+                        </div>
+                      )}
+                      {rate && (
+                        <div className="listing-detail__renditeRow">
+                          <IconPercentage style={{ flexShrink: 0, color: 'var(--semi-color-text-2)' }} />
+                          <div>
+                            <div className="listing-detail__renditeValue">
+                              {rate.toLocaleString('de-DE')} € <sup>/ Monat</sup>
+                            </div>
+                            <div className="listing-detail__renditeLabel">Finanzierungsrate ({fq} % p.a.)</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                );
+              })()}
               <Divider margin="1.5rem" />
               <Title heading={4} style={{ marginBottom: '1rem' }}>
                 Description

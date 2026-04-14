@@ -32,7 +32,6 @@ import {
   IconCart,
   IconClock,
   IconDelete,
-  IconLink,
   IconMapPin,
   IconStar,
   IconStarStroked,
@@ -41,9 +40,13 @@ import {
   IconEyeOpened,
   IconArrowUp,
   IconArrowDown,
+  IconNoteMoney,
+  IconHome,
+  IconPercentage,
 } from '@douyinfe/semi-icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ListingDeletionModal from '../../ListingDeletionModal.jsx';
+import PriceRatingBadge from '../../PriceRatingBadge.jsx';
 import no_image from '../../../assets/no_image.jpg';
 import * as timeService from '../../../services/time/timeService.js';
 import { xhrDelete, xhrPost } from '../../../services/xhr.js';
@@ -73,6 +76,7 @@ const ListingsGrid = () => {
   const [jobNameFilter, setJobNameFilter] = useSearchParamState(sp, 'job', null, parseString);
   const [activityFilter, setActivityFilter] = useSearchParamState(sp, 'active', null, parseNullableBoolean);
   const [providerFilter, setProviderFilter] = useSearchParamState(sp, 'provider', null, parseString);
+  const [priceRatingFilter, setPriceRatingFilter] = useSearchParamState(sp, 'rating', null, parseString);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [listingToDelete, setListingToDelete] = useState(null);
 
@@ -140,6 +144,22 @@ const ListingsGrid = () => {
   const cap = (val) => {
     return String(val).charAt(0).toUpperCase() + String(val).slice(1);
   };
+
+  const getJobRating = (item) => {
+    if (!item.price || !(item.size > 0)) return null;
+    const pricePerSqm = Math.round(item.price / item.size);
+    const specFilter = jobs.find((j) => j.id === item.job_id)?.specFilter;
+    const lowMax = specFilter?.sqmLowMax ?? 1499;
+    const mediumMax = specFilter?.sqmMediumMax ?? 2499;
+    if (pricePerSqm > mediumMax) return 'high';
+    if (pricePerSqm > lowMax) return 'medium';
+    return 'low';
+  };
+
+  const visibleListings = (listingsData?.result || []).filter((item) => {
+    if (!priceRatingFilter) return true;
+    return getJobRating(item) === priceRatingFilter;
+  });
 
   return (
     <div className="listingsGrid">
@@ -229,9 +249,31 @@ const ListingsGrid = () => {
           onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
           title={sortDir === 'asc' ? 'Ascending' : 'Descending'}
         />
+
+        <RadioGroup
+          type="button"
+          buttonSize="middle"
+          value={priceRatingFilter ?? 'all'}
+          onChange={(e) => {
+            const v = e.target.value;
+            setPriceRatingFilter(v === 'all' ? null : v);
+            setPage(1);
+          }}
+        >
+          <Radio value="all">All</Radio>
+          <Radio value="low">
+            <span style={{ color: '#52c41a', fontWeight: 700 }}>LOW</span>
+          </Radio>
+          <Radio value="medium">
+            <span style={{ color: '#fa8c16', fontWeight: 700 }}>MEDIUM</span>
+          </Radio>
+          <Radio value="high">
+            <span style={{ color: '#ff4d4f', fontWeight: 700 }}>HIGH</span>
+          </Radio>
+        </RadioGroup>
       </div>
 
-      {(listingsData?.result || []).length === 0 && (
+      {visibleListings.length === 0 && (
         <Empty
           image={<IllustrationNoResult />}
           darkModeImage={<IllustrationNoResultDark />}
@@ -239,7 +281,7 @@ const ListingsGrid = () => {
         />
       )}
       <Row gutter={[16, 16]}>
-        {(listingsData?.result || []).map((item) => (
+        {visibleListings.map((item) => (
           <Col key={item.id} xs={24} sm={12} md={12} lg={8} xl={8} xxl={6}>
             <Card
               className={`listingsGrid__card ${!item.is_active ? 'listingsGrid__card--inactive' : ''}`}
@@ -283,7 +325,68 @@ const ListingsGrid = () => {
                 <div className="listingsGrid__price">
                   <IconCart size="small" />
                   {item.price} €
+                  {item.price && item.size > 0 && (
+                    <>
+                      <Text type="tertiary" size="small" style={{ marginLeft: '8px' }}>
+                        · {Math.round(item.price / item.size).toLocaleString('de-DE')} €/m²
+                      </Text>
+                      <PriceRatingBadge
+                        pricePerSqm={Math.round(item.price / item.size)}
+                        specFilter={jobs.find((j) => j.id === item.job_id)?.specFilter}
+                      />
+                    </>
+                  )}
                 </div>
+                {item.price > 0 && (
+                  <div className="listingsGrid__nk">
+                    <IconNoteMoney size="small" />
+                    {Math.round(item.price * 0.1207).toLocaleString('de-DE')} €
+                    <sup className="listingsGrid__nkLabel">Nebenkosten</sup>
+                  </div>
+                )}
+                {(() => {
+                  const spec = jobs.find((j) => j.id === item.job_id)?.specFilter;
+                  const rental = spec?.rentalPricePerSqm;
+                  const fq = spec?.finanzierungsquotient;
+                  if (!rental || !item.size) return null;
+                  const mieteinnahmen = Math.round(item.size * rental);
+                  const roiJahre = item.price > 0 ? (item.price / (mieteinnahmen * 12)).toFixed(1) : null;
+                  const rate = fq && item.price > 0 ? Math.round((item.price * (fq / 100)) / 12) : null;
+                  const uberschuss = rate != null ? mieteinnahmen - rate : null;
+                  return (
+                    <div className="listingsGrid__rendite">
+                      <div className="listingsGrid__renditeRow">
+                        <IconHome size="extra-small" />
+                        <span className="listingsGrid__renditeItem">
+                          {mieteinnahmen.toLocaleString('de-DE')} €
+                          <sup className="listingsGrid__nkLabel">Einnahmen</sup>
+                        </span>
+                        {rate != null && (
+                          <>
+                            <span className="listingsGrid__renditeSep">·</span>
+                            <IconPercentage size="extra-small" />
+                            <span className="listingsGrid__renditeItem">
+                              {rate.toLocaleString('de-DE')} €<sup className="listingsGrid__nkLabel">Rate</sup>
+                            </span>
+                            <span className="listingsGrid__renditeSep">·</span>
+                            <span
+                              className={`listingsGrid__renditeItem ${uberschuss >= 0 ? 'listingsGrid__renditePositiv' : 'listingsGrid__renditeNegativ'}`}
+                            >
+                              {uberschuss >= 0 ? '+' : ''}
+                              {uberschuss.toLocaleString('de-DE')} €
+                              <sup className="listingsGrid__nkLabel">Überschuss</sup>
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      {roiJahre && (
+                        <div className="listingsGrid__renditeRow">
+                          <span className="listingsGrid__roiBadge">ROI {roiJahre} J.</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
                 <div className="listingsGrid__meta">
                   <Text
                     type="secondary"
@@ -295,9 +398,25 @@ const ListingsGrid = () => {
                     {item.address || 'No address provided'}
                   </Text>
                   <Space spacing={12} wrap>
-                    <Text type="tertiary" size="small" icon={<IconBriefcase />}>
-                      {item.provider.charAt(0).toUpperCase() + item.provider.slice(1)}
-                    </Text>
+                    <div className="listingsGrid__sources">
+                      {[
+                        { provider: item.provider, link: item.link },
+                        ...(item.additional_sources ? JSON.parse(item.additional_sources) : []),
+                      ].map((src, i) => (
+                        <a
+                          key={i}
+                          href={src.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="listingsGrid__sourceLink"
+                          onClick={(e) => e.stopPropagation()}
+                          title={src.provider.charAt(0).toUpperCase() + src.provider.slice(1)}
+                        >
+                          <IconBriefcase size="small" />
+                          <span>{src.provider.charAt(0).toUpperCase() + src.provider.slice(1)}</span>
+                        </a>
+                      ))}
+                    </div>
                     <Text type="tertiary" size="small" icon={<IconClock />}>
                       {timeService.format(item.created_at, false)}
                     </Text>
@@ -314,11 +433,6 @@ const ListingsGrid = () => {
                 </div>
                 <Divider margin=".6rem" />
                 <div className="listingsGrid__actions">
-                  <div className="listingsGrid__linkButton" onClick={(e) => e.stopPropagation()}>
-                    <a href={item.link} target="_blank" rel="noopener noreferrer">
-                      <IconLink />
-                    </a>
-                  </div>
                   <Button
                     type="secondary"
                     size="small"
@@ -343,7 +457,7 @@ const ListingsGrid = () => {
           </Col>
         ))}
       </Row>
-      {(listingsData?.result || []).length > 0 && (
+      {visibleListings.length > 0 && (
         <div className="listingsGrid__pagination">
           <Pagination
             currentPage={page}

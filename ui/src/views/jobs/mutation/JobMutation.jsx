@@ -252,6 +252,116 @@ export default function JobMutator() {
         <Divider margin="1rem" />
         <SegmentPart
           Icon={IconFilter}
+          name="Preis-Bewertung (€/m²)"
+          helpText="Definiere die Preisspannen pro m² für die farbliche Bewertung. LOW (grün) bis zum eingegebenen Maximalwert, MEDIUM (orange) bis zum zweiten Maximalwert, alles darüber ist TEUER (rot)."
+        >
+          <div className="jobMutation__priceRating">
+            {[
+              {
+                color: '#52c41a',
+                labelKey: 'sqmLowLabel',
+                defaultLabel: 'LOW',
+                from: '0',
+                fromDisabled: true,
+                toKey: 'sqmLowMax',
+                toDisabled: false,
+                toPlaceholder: '1499',
+                toValue: String(specFilter?.sqmLowMax ?? ''),
+              },
+              {
+                color: '#fa8c16',
+                labelKey: 'sqmMediumLabel',
+                defaultLabel: 'MEDIUM',
+                from: specFilter?.sqmLowMax != null ? String(Number(specFilter.sqmLowMax) + 0.1) : '1499.1',
+                fromDisabled: true,
+                toKey: 'sqmMediumMax',
+                toDisabled: false,
+                toPlaceholder: '2499',
+                toValue: String(specFilter?.sqmMediumMax ?? ''),
+              },
+              {
+                color: '#ff4d4f',
+                labelKey: 'sqmHighLabel',
+                defaultLabel: 'HIGH',
+                from: specFilter?.sqmMediumMax != null ? String(Number(specFilter.sqmMediumMax) + 0.1) : '2499.1',
+                fromDisabled: true,
+                toKey: null,
+                toDisabled: true,
+                toPlaceholder: '∞',
+                toValue: '',
+              },
+            ].map(
+              ({ color, labelKey, defaultLabel, from, fromDisabled, toKey, toDisabled, toPlaceholder, toValue }) => (
+                <div key={labelKey} className="jobMutation__priceRatingRow">
+                  <Input
+                    className="jobMutation__priceRatingLabelInput"
+                    placeholder={defaultLabel}
+                    value={specFilter?.[labelKey] ?? ''}
+                    style={{ color }}
+                    onChange={(value) => setSpecFilter({ ...specFilter, [labelKey]: value || null })}
+                  />
+                  <Input
+                    className="jobMutation__priceRatingInput"
+                    type="number"
+                    disabled={fromDisabled}
+                    value={from}
+                    suffix="€/m²"
+                  />
+                  <span className="jobMutation__priceRatingDash">—</span>
+                  <Input
+                    className="jobMutation__priceRatingInput"
+                    type={toDisabled ? 'text' : 'number'}
+                    disabled={toDisabled}
+                    placeholder={toPlaceholder}
+                    value={toValue || (toDisabled ? '∞' : '')}
+                    suffix={toDisabled ? '' : '€/m²'}
+                    onChange={
+                      toKey
+                        ? (value) => setSpecFilter({ ...specFilter, [toKey]: value ? parseFloat(value) : null })
+                        : undefined
+                    }
+                  />
+                </div>
+              ),
+            )}
+          </div>
+        </SegmentPart>
+        <Divider margin="1rem" />
+        <SegmentPart
+          Icon={IconFilter}
+          name="Mietrendite & Finanzierung"
+          helpText="Konfiguriere Kennzahlen zur Renditebewertung. Der Mietpreis pro m² wird zur Berechnung der potenziellen Mieteinnahmen verwendet. Der Finanzierungsquotient (% p.a.) berechnet die monatliche Finanzierungsrate auf den Kaufpreis."
+        >
+          <div className="jobMutation__specFilter">
+            <div className="jobMutation__specFilterItem">
+              <div className="jobMutation__specFilterLabel">Mietpreis (€/m²)</div>
+              <Input
+                type="number"
+                placeholder="z.B. 12"
+                suffix="€/m²"
+                value={specFilter?.rentalPricePerSqm ?? ''}
+                onChange={(value) =>
+                  setSpecFilter({ ...specFilter, rentalPricePerSqm: value ? parseFloat(value) : null })
+                }
+              />
+            </div>
+            <div className="jobMutation__specFilterItem">
+              <div className="jobMutation__specFilterLabel">Finanzierungsquotient (% p.a.)</div>
+              <Input
+                type="number"
+                placeholder="z.B. 4.5"
+                suffix="% p.a."
+                value={specFilter?.finanzierungsquotient ?? ''}
+                onChange={(value) =>
+                  setSpecFilter({ ...specFilter, finanzierungsquotient: value ? parseFloat(value) : null })
+                }
+              />
+            </div>
+          </div>
+        </SegmentPart>
+        <Divider margin="1rem" />
+        <SegmentPart
+          Icon={IconFilter}
           name="Area Filter"
           helpText="Define multiple geographic areas on the map to filter listings. Start drawing by clicking on the square symbol in the top left corner of the map. Click on the map to add points of the polygon. Select the first point to close the polygon. After that, click on a free area of the map to apply this polygon (the color will change from yellow to blue). To delete a polygon, select it first and then click on the trash symbol."
         >

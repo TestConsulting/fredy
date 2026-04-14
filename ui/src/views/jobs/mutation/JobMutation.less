@@ -21,6 +21,39 @@
   &__specFilterLabel {
     font-weight: 500;
   }
+
+  &__priceRating {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__priceRatingRow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__priceRatingLabelInput {
+    width: 100px;
+    flex-shrink: 0;
+
+    input {
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+    }
+  }
+
+  &__priceRatingInput {
+    width: 160px;
+    flex-shrink: 0;
+  }
+
+  &__priceRatingDash {
+    color: var(--semi-color-text-2);
+    flex-shrink: 0;
+  }
 }
 
 .semi-select-option-list-wrapper {
