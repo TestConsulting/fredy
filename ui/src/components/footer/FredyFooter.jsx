@@ -18,9 +18,6 @@ export default function FredyFooter() {
         <Text type="tertiary" size="small">
           Fredy V{version?.localFredyVersion || 'N/A'}
         </Text>
-        <Text size="small" link={{ href: 'https://github.com/orangecoding', target: '_blank' }}>
-          Made with ❤️
-        </Text>
       </Space>
     </Footer>
   );
