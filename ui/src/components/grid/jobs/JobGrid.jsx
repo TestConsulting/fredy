@@ -301,6 +301,10 @@ const JobGrid = () => {
                 </div>
               </div>
 
+              {job.lastRun && (
+                <div className="jobGrid__card__lastRun">Last run: {new Date(job.lastRun).toLocaleString()}</div>
+              )}
+
               <Divider margin="12px" />
 
               <div className="jobGrid__card__footer">
