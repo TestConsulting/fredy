@@ -55,6 +55,8 @@ const GeneralSettings = function GeneralSettings() {
   const settings = useSelector((state) => state.generalSettings.settings);
 
   const [interval, setInterval] = React.useState('');
+  const [intervalEnabled, setIntervalEnabled] = React.useState(true);
+  const [scheduledTimes, setScheduledTimes] = React.useState([]);
   const [port, setPort] = React.useState('');
   const [workingHourFrom, setWorkingHourFrom] = React.useState(null);
   const [workingHourTo, setWorkingHourTo] = React.useState(null);
@@ -88,6 +90,8 @@ const GeneralSettings = function GeneralSettings() {
   React.useEffect(() => {
     async function init() {
       setInterval(settings?.interval);
+      setIntervalEnabled(settings?.intervalEnabled !== false);
+      setScheduledTimes(Array.isArray(settings?.scheduledTimes) ? settings.scheduledTimes : []);
       setPort(settings?.port);
       setWorkingHourFrom(settings?.workingHours?.from);
       setWorkingHourTo(settings?.workingHours?.to);
@@ -129,6 +133,8 @@ const GeneralSettings = function GeneralSettings() {
     try {
       await xhrPost('/api/admin/generalSettings', {
         interval,
+        intervalEnabled,
+        scheduledTimes,
         port,
         workingHours: {
           from: workingHourFrom,
@@ -325,6 +331,13 @@ const GeneralSettings = function GeneralSettings() {
                   name="Search Interval"
                   helpText="Interval in minutes for running queries against configured services. Do not go below 5 minutes to avoid being detected as a bot."
                 >
+                  <Checkbox
+                    checked={intervalEnabled}
+                    onChange={(e) => setIntervalEnabled(e.target.checked)}
+                    style={{ marginBottom: 12 }}
+                  >
+                    Enable interval-based execution
+                  </Checkbox>
                   <InputNumber
                     min={5}
                     max={1440}
@@ -334,7 +347,44 @@ const GeneralSettings = function GeneralSettings() {
                     onChange={(value) => setInterval(value)}
                     suffix={'minutes'}
                     style={{ maxWidth: 200 }}
+                    disabled={!intervalEnabled}
                   />
+                </SegmentPart>
+
+                <SegmentPart
+                  name="Scheduled Times"
+                  helpText="Run jobs at specific times of day. Add one or more times. These run in addition to the interval if enabled."
+                >
+                  <div className="generalSettings__scheduledTimes">
+                    {scheduledTimes.map((time, idx) => (
+                      <div key={idx} className="generalSettings__scheduledTimeRow">
+                        <TimePicker
+                          format={'HH:mm'}
+                          value={formatFromTBackend(time)}
+                          placeholder="HH:mm"
+                          onChange={(val) => {
+                            const next = [...scheduledTimes];
+                            next[idx] = val == null ? null : formatFromTimestamp(val);
+                            setScheduledTimes(next.filter(Boolean));
+                          }}
+                        />
+                        <Button
+                          type="danger"
+                          theme="light"
+                          size="small"
+                          onClick={() => {
+                            const next = scheduledTimes.filter((_, i) => i !== idx);
+                            setScheduledTimes(next);
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+                    <Button theme="light" size="small" onClick={() => setScheduledTimes([...scheduledTimes, '08:00'])}>
+                      + Add time
+                    </Button>
+                  </div>
                 </SegmentPart>
 
                 <SegmentPart
