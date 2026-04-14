@@ -34,7 +34,9 @@ import './GeneralSettings.less';
 
 function formatFromTimestamp(ts) {
   const date = new Date(ts);
-  return `${date.getHours()}:${date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes()}`;
+  const h = String(date.getHours()).padStart(2, '0');
+  const m = String(date.getMinutes()).padStart(2, '0');
+  return `${h}:${m}`;
 }
 
 function formatFromTBackend(time) {
