@@ -44,6 +44,7 @@ import {
   IconNoteMoney,
   IconHome,
   IconPercentage,
+  IconFilter,
 } from '@douyinfe/semi-icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ListingDeletionModal from '../../ListingDeletionModal.jsx';
@@ -81,6 +82,7 @@ const ListingsGrid = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [listingToDelete, setListingToDelete] = useState(null);
   const [deleteAllModalVisible, setDeleteAllModalVisible] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const loadData = () => {
     actions.listingsData.getListingsData({
@@ -178,117 +180,135 @@ const ListingsGrid = () => {
   return (
     <div className="listingsGrid">
       <div className="listingsGrid__topbar">
-        <Input
-          className="listingsGrid__topbar__search"
-          prefix={<IconSearch />}
-          showClear
-          placeholder="Search"
-          defaultValue={freeTextFilter ?? ''}
-          onChange={handleFilterChange}
-        />
+        <div className="listingsGrid__topbar__row1">
+          <Input
+            className="listingsGrid__topbar__search"
+            prefix={<IconSearch />}
+            showClear
+            placeholder="Search"
+            defaultValue={freeTextFilter ?? ''}
+            onChange={handleFilterChange}
+          />
+          <Button
+            className="listingsGrid__filterToggle"
+            icon={<IconFilter />}
+            onClick={() => setFiltersOpen((f) => !f)}
+            type={filtersOpen ? 'primary' : 'tertiary'}
+            theme="light"
+          >
+            Filter
+          </Button>
+          <Button
+            className="listingsGrid__deleteAllBtn"
+            type="danger"
+            theme="light"
+            icon={<IconDelete />}
+            onClick={() => setDeleteAllModalVisible(true)}
+          >
+            <span className="listingsGrid__deleteAllLabel">Alle löschen</span>
+          </Button>
+        </div>
 
-        <RadioGroup
-          type="button"
-          buttonSize="middle"
-          value={activityFilter === null ? 'all' : String(activityFilter)}
-          onChange={(e) => {
-            const v = e.target.value;
-            setActivityFilter(v === 'all' ? null : v === 'true');
-            setPage(1);
-          }}
-        >
-          <Radio value="all">All</Radio>
-          <Radio value="true">Active</Radio>
-          <Radio value="false">Inactive</Radio>
-        </RadioGroup>
+        <div className={`listingsGrid__topbar__filters${filtersOpen ? ' listingsGrid__topbar__filters--open' : ''}`}>
+          <RadioGroup
+            type="button"
+            buttonSize="middle"
+            value={activityFilter === null ? 'all' : String(activityFilter)}
+            onChange={(e) => {
+              const v = e.target.value;
+              setActivityFilter(v === 'all' ? null : v === 'true');
+              setPage(1);
+            }}
+          >
+            <Radio value="all">All</Radio>
+            <Radio value="true">Active</Radio>
+            <Radio value="false">Inactive</Radio>
+          </RadioGroup>
 
-        <RadioGroup
-          type="button"
-          buttonSize="middle"
-          value={watchListFilter === null ? 'all' : String(watchListFilter)}
-          onChange={(e) => {
-            const v = e.target.value;
-            setWatchListFilter(v === 'all' ? null : v === 'true');
-            setPage(1);
-          }}
-        >
-          <Radio value="all">All</Radio>
-          <Radio value="true">Watched</Radio>
-          <Radio value="false">Unwatched</Radio>
-        </RadioGroup>
+          <RadioGroup
+            type="button"
+            buttonSize="middle"
+            value={watchListFilter === null ? 'all' : String(watchListFilter)}
+            onChange={(e) => {
+              const v = e.target.value;
+              setWatchListFilter(v === 'all' ? null : v === 'true');
+              setPage(1);
+            }}
+          >
+            <Radio value="all">All</Radio>
+            <Radio value="true">Watched</Radio>
+            <Radio value="false">Unwatched</Radio>
+          </RadioGroup>
 
-        <Select
-          placeholder="Provider"
-          showClear
-          onChange={(val) => {
-            setProviderFilter(val);
-            setPage(1);
-          }}
-          value={providerFilter}
-          style={{ width: 130 }}
-        >
-          {providers?.map((p) => (
-            <Select.Option key={p.id} value={p.id}>
-              {p.name}
-            </Select.Option>
-          ))}
-        </Select>
+          <Select
+            placeholder="Provider"
+            showClear
+            onChange={(val) => {
+              setProviderFilter(val);
+              setPage(1);
+            }}
+            value={providerFilter}
+            style={{ width: 130 }}
+          >
+            {providers?.map((p) => (
+              <Select.Option key={p.id} value={p.id}>
+                {p.name}
+              </Select.Option>
+            ))}
+          </Select>
 
-        <Select
-          placeholder="Job"
-          showClear
-          onChange={(val) => {
-            setJobNameFilter(val);
-            setPage(1);
-          }}
-          value={jobNameFilter}
-          style={{ width: 130 }}
-        >
-          {jobs?.map((j) => (
-            <Select.Option key={j.id} value={j.id}>
-              {j.name}
-            </Select.Option>
-          ))}
-        </Select>
+          <Select
+            placeholder="Job"
+            showClear
+            onChange={(val) => {
+              setJobNameFilter(val);
+              setPage(1);
+            }}
+            value={jobNameFilter}
+            style={{ width: 130 }}
+          >
+            {jobs?.map((j) => (
+              <Select.Option key={j.id} value={j.id}>
+                {j.name}
+              </Select.Option>
+            ))}
+          </Select>
 
-        <Select prefix="Sort by" style={{ width: 185 }} value={sortField} onChange={(val) => setSortField(val)}>
-          <Select.Option value="job_name">Job Name</Select.Option>
-          <Select.Option value="created_at">Listing Date</Select.Option>
-          <Select.Option value="price">Price</Select.Option>
-          <Select.Option value="provider">Provider</Select.Option>
-        </Select>
+          <Select prefix="Sort by" style={{ width: 185 }} value={sortField} onChange={(val) => setSortField(val)}>
+            <Select.Option value="job_name">Job Name</Select.Option>
+            <Select.Option value="created_at">Listing Date</Select.Option>
+            <Select.Option value="price">Price</Select.Option>
+            <Select.Option value="provider">Provider</Select.Option>
+          </Select>
 
-        <Button
-          icon={sortDir === 'asc' ? <IconArrowUp /> : <IconArrowDown />}
-          onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-          title={sortDir === 'asc' ? 'Ascending' : 'Descending'}
-        />
+          <Button
+            icon={sortDir === 'asc' ? <IconArrowUp /> : <IconArrowDown />}
+            onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+            title={sortDir === 'asc' ? 'Ascending' : 'Descending'}
+          />
 
-        <RadioGroup
-          type="button"
-          buttonSize="middle"
-          value={priceRatingFilter ?? 'all'}
-          onChange={(e) => {
-            const v = e.target.value;
-            setPriceRatingFilter(v === 'all' ? null : v);
-            setPage(1);
-          }}
-        >
-          <Radio value="all">All</Radio>
-          <Radio value="low">
-            <span style={{ color: '#52c41a', fontWeight: 700 }}>LOW</span>
-          </Radio>
-          <Radio value="medium">
-            <span style={{ color: '#fa8c16', fontWeight: 700 }}>MEDIUM</span>
-          </Radio>
-          <Radio value="high">
-            <span style={{ color: '#ff4d4f', fontWeight: 700 }}>HIGH</span>
-          </Radio>
-        </RadioGroup>
-
-        <Button type="danger" theme="light" icon={<IconDelete />} onClick={() => setDeleteAllModalVisible(true)}>
-          Alle löschen
-        </Button>
+          <RadioGroup
+            type="button"
+            buttonSize="middle"
+            value={priceRatingFilter ?? 'all'}
+            onChange={(e) => {
+              const v = e.target.value;
+              setPriceRatingFilter(v === 'all' ? null : v);
+              setPage(1);
+            }}
+          >
+            <Radio value="all">All</Radio>
+            <Radio value="low">
+              <span style={{ color: '#52c41a', fontWeight: 700 }}>LOW</span>
+            </Radio>
+            <Radio value="medium">
+              <span style={{ color: '#fa8c16', fontWeight: 700 }}>MEDIUM</span>
+            </Radio>
+            <Radio value="high">
+              <span style={{ color: '#ff4d4f', fontWeight: 700 }}>HIGH</span>
+            </Radio>
+          </RadioGroup>
+        </div>
       </div>
 
       {visibleListings.length === 0 && (
