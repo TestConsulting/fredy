@@ -338,7 +338,7 @@ const GeneralSettings = function GeneralSettings() {
                     onChange={(e) => setIntervalEnabled(e.target.checked)}
                     style={{ marginBottom: 12 }}
                   >
-                    Enable interval-based execution
+                    Interval-based execution - Status: {intervalEnabled ? 'Active' : 'Inactive'}
                   </Checkbox>
                   <InputNumber
                     min={5}
