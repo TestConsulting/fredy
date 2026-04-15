@@ -355,7 +355,7 @@ const GeneralSettings = function GeneralSettings() {
 
                 <SegmentPart
                   name="Scheduled Times"
-                  helpText="Run jobs at specific times of day. Add one or more times. These run in addition to the interval if enabled."
+                  helpText="2h issue Time  Reducement needed [Execute Time 08:00 Fredy konfig: 10:00]"
                 >
                   <div className="generalSettings__scheduledTimes">
                     {scheduledTimes.map((time, idx) => (

@@ -9,3 +9,73 @@
     padding-bottom: 12px;
   }
 }
+
+// ── Fallback floating trigger (other pages that have no inline button) ───────
+.navigation__fabTrigger {
+  display: none; // only on mobile (see media query)
+
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 997;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--semi-color-border);
+  background: var(--semi-color-bg-1);
+  color: var(--semi-color-text-1);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--semi-shadow-elevated);
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+
+  &--hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+// ── Backdrop ─────────────────────────────────────────────────────────────────
+.navigation__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  background: rgba(0, 0, 0, 0.5);
+  animation: navFadeIn 0.2s ease;
+}
+
+@keyframes navFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── Drawer ───────────────────────────────────────────────────────────────────
+.navigation__drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 999;
+  width: 240px;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+
+  &--open {
+    transform: translateX(0);
+  }
+
+  .semi-navigation {
+    height: 100%;
+    max-width: 240px !important;
+  }
+}
+
+// ── Mobile overrides ─────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .navigation__fabTrigger {
+    display: flex;
+  }
+}

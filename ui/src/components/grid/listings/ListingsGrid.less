@@ -39,7 +39,11 @@
     }
   }
 
-  // Filter toggle button: hidden on desktop
+  // Nav + filter toggle buttons: hidden on desktop
+  &__navToggle {
+    display: none !important;
+  }
+
   &__filterToggle {
     display: none !important;
   }
@@ -286,7 +290,12 @@
   // ─── Mobile (≤ 640 px) ─────────────────────────────────────────────────────
 
   @media (max-width: 640px) {
-    // Filter toggle visible, filters collapsed by default
+    // Nav + filter toggle visible on mobile
+    &__navToggle {
+      display: inline-flex !important;
+      flex-shrink: 0;
+    }
+
     &__filterToggle {
       display: inline-flex !important;
       flex-shrink: 0;
