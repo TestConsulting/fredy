@@ -24,6 +24,19 @@
       padding: 12px;
     }
   }
+
+  // Sider takes no space on mobile — Navigation renders its own drawer overlay.
+  // Must use width:0 + overflow:hidden instead of display:none so that the
+  // position:fixed drawer and FAB inside Navigation remain visible.
+  @media (max-width: 640px) {
+    .semi-layout-sider {
+      width: 0 !important;
+      min-width: 0 !important;
+      max-width: 0 !important;
+      flex: 0 0 0 !important;
+      overflow: hidden;
+    }
+  }
 }
 
 .semi-icon:not(.semi-tabs-bar .semi-tabs-tab .semi-icon) {

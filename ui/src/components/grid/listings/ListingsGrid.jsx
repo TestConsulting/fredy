@@ -45,6 +45,7 @@ import {
   IconHome,
   IconPercentage,
   IconFilter,
+  IconMenu,
 } from '@douyinfe/semi-icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ListingDeletionModal from '../../ListingDeletionModal.jsx';
@@ -181,6 +182,13 @@ const ListingsGrid = () => {
     <div className="listingsGrid">
       <div className="listingsGrid__topbar">
         <div className="listingsGrid__topbar__row1">
+          <Button
+            className="listingsGrid__navToggle"
+            icon={<IconMenu />}
+            onClick={() => window.dispatchEvent(new CustomEvent('fredy:openNav'))}
+            theme="borderless"
+            aria-label="Open menu"
+          />
           <Input
             className="listingsGrid__topbar__search"
             prefix={<IconSearch />}

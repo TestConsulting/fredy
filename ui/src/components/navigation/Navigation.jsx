@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button, Nav } from '@douyinfe/semi-ui-19';
-import { IconStar, IconSetting, IconTerminal, IconHistogram, IconSidebar } from '@douyinfe/semi-icons';
+import { IconStar, IconSetting, IconTerminal, IconHistogram, IconSidebar, IconMenu } from '@douyinfe/semi-icons';
 import logoWhite from '../../assets/logo_white.png';
 import heart from '../../assets/heart.png';
 import Logout from '../logout/Logout.jsx';
@@ -19,13 +19,25 @@ export default function Navigation({ isAdmin }) {
   const location = useLocation();
 
   const width = useScreenWidth();
+  const isMobile = width <= 640;
   const [collapsed, setCollapsed] = useState(width <= 850);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
-    if (width <= 850) {
-      setCollapsed(true);
-    }
+    if (width <= 850) setCollapsed(true);
   }, [width]);
+
+  // Any page can open the drawer via: window.dispatchEvent(new CustomEvent('fredy:openNav'))
+  useEffect(() => {
+    const handler = () => setDrawerOpen(true);
+    window.addEventListener('fredy:openNav', handler);
+    return () => window.removeEventListener('fredy:openNav', handler);
+  }, []);
+
+  // Close drawer on route change
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname]);
 
   const items = [
     { itemKey: '/dashboard', text: 'Dashboard', icon: <IconHistogram /> },
@@ -65,22 +77,62 @@ export default function Navigation({ isAdmin }) {
     return '/' + split[0];
   }
 
+  const activeKey = parsePathName(location.pathname);
+
+  // ── Desktop sidebar ──────────────────────────────────────────────────────
+  if (!isMobile) {
+    return (
+      <Nav
+        style={{ height: '100%', maxWidth: collapsed ? '60px' : '240px' }}
+        items={items}
+        isCollapsed={collapsed}
+        selectedKeys={[activeKey]}
+        onSelect={(key) => navigate(key.itemKey)}
+        header={<img src={collapsed ? heart : logoWhite} width={collapsed ? '30' : '120'} alt="Fredy Logo" />}
+        footer={
+          <Nav.Footer className="navigate__footer">
+            <Logout text={!collapsed} />
+            <Button icon={<IconSidebar />} onClick={() => setCollapsed(!collapsed)} />
+          </Nav.Footer>
+        }
+      />
+    );
+  }
+
+  // ── Mobile: drawer only (triggered via event or fallback button) ─────────
   return (
-    <Nav
-      style={{ height: '100%', maxWidth: collapsed ? '60px' : '240px' }}
-      items={items}
-      isCollapsed={collapsed}
-      selectedKeys={[parsePathName(location.pathname)]}
-      onSelect={(key) => {
-        navigate(key.itemKey);
-      }}
-      header={<img src={collapsed ? heart : logoWhite} width={collapsed ? '30' : '120'} alt="Fredy Logo" />}
-      footer={
-        <Nav.Footer className="navigate__footer">
-          <Logout text={!collapsed} />
-          <Button icon={<IconSidebar />} onClick={() => setCollapsed(!collapsed)} />
-        </Nav.Footer>
-      }
-    />
+    <>
+      {/* Fallback fixed button — hidden on pages that have their own inline trigger */}
+      {!location.pathname.startsWith('/listings') && (
+        <button
+          className={`navigation__fabTrigger${drawerOpen ? ' navigation__fabTrigger--hidden' : ''}`}
+          onClick={() => setDrawerOpen(true)}
+          aria-label="Open menu"
+        >
+          <IconMenu size="large" />
+        </button>
+      )}
+
+      {/* Backdrop */}
+      {drawerOpen && <div className="navigation__backdrop" onClick={() => setDrawerOpen(false)} />}
+
+      {/* Drawer slides in from left */}
+      <div className={`navigation__drawer${drawerOpen ? ' navigation__drawer--open' : ''}`}>
+        <Nav
+          style={{ height: '100%', maxWidth: '240px' }}
+          items={items}
+          isCollapsed={false}
+          selectedKeys={[activeKey]}
+          onSelect={(key) => navigate(key.itemKey)}
+          header={<img src={logoWhite} width={120} alt="Fredy Logo" />}
+          footer={
+            <Nav.Footer className="navigate__footer">
+              <Logout text={true} />
+              <Button icon={<IconSidebar />} onClick={() => setDrawerOpen(false)} />
+            </Nav.Footer>
+          }
+        />
+      </div>
+    </>
   );
 }
