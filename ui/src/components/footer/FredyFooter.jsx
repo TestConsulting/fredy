@@ -12,12 +12,22 @@ export default function FredyFooter() {
   const { Footer } = Layout;
   const version = useSelector((state) => state.versionUpdate.versionUpdate);
 
+  const buildDate =
+    typeof __BUILD_DATE__ !== 'undefined'
+      ? new Date(__BUILD_DATE__).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' })
+      : null;
+
   return (
     <Footer className="fredyFooter">
       <Space split={<Divider layout="vertical" />}>
         <Text type="tertiary" size="small">
           Fredy V{version?.localFredyVersion || 'N/A'}
         </Text>
+        {buildDate && (
+          <Text type="tertiary" size="small">
+            Deployed: {buildDate}
+          </Text>
+        )}
       </Space>
     </Footer>
   );

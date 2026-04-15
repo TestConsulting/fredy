@@ -34,6 +34,7 @@ export default [
         beforeEach: 'readonly',
         afterEach: 'readonly',
         vi: 'readonly',
+        __BUILD_DATE__: 'readonly',
       },
     },
     plugins: { react },
