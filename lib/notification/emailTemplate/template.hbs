@@ -78,16 +78,56 @@
                                         <table role="presentation" width="100%">
                                             <tr>
                                                 <td class="stack" style="vertical-align:top; width:50%; padding-right:8px;">
-                                                    <p class="meta"><strong>Price</strong><br/>{{#if this.price}}{{this.price}}{{else}}unknown{{/if}}</p>
+                                                    <p class="meta"><strong>Preis</strong><br/>{{#if this.price}}{{this.price}}{{else}}–{{/if}}</p>
                                                 </td>
                                                 <td class="stack" style="vertical-align:top; width:50%; padding-left:8px;">
-                                                    <p class="meta"><strong>Size</strong><br/>{{#if this.size}}{{this.size}}{{else}}unknown{{/if}}</p>
+                                                    <p class="meta"><strong>Größe</strong><br/>{{#if this.size}}{{this.size}}{{else}}–{{/if}}</p>
                                                 </td>
                                             </tr>
                                             <tr><td class="sp-8"></td><td class="sp-8"></td></tr>
+                                            {{#if this.hasRating}}
+                                            <tr>
+                                                <td class="stack" style="vertical-align:top; width:50%; padding-right:8px;">
+                                                    <p class="meta"><strong>€/m²</strong><br/>{{this.pricePerSqm}} €/m²</p>
+                                                </td>
+                                                <td class="stack" style="vertical-align:top; width:50%; padding-left:8px;">
+                                                    <p class="meta"><strong>Bewertung</strong><br/><span style="color:{{this.ratingColor}};font-weight:700;">{{this.rating}}</span></p>
+                                                </td>
+                                            </tr>
+                                            <tr><td class="sp-8"></td><td class="sp-8"></td></tr>
+                                            {{/if}}
+                                            {{#if this.hasRendite}}
+                                            <tr>
+                                                <td colspan="2" style="background:#1a1a1a;border-radius:6px;padding:10px 12px;">
+                                                    <p class="meta" style="margin-bottom:6px;color:#9f9f9f;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Mietrendite &amp; Finanzierung</p>
+                                                    <table role="presentation" width="100%">
+                                                        <tr>
+                                                            <td style="vertical-align:top;width:50%;padding-right:8px;">
+                                                                <p class="meta"><strong>🏠 Mieteinnahmen</strong><br/>{{this.mieteinnahmen}} € / Monat</p>
+                                                            </td>
+                                                            <td style="vertical-align:top;width:50%;padding-left:8px;">
+                                                                <p class="meta"><strong>📈 ROI</strong><br/>{{this.roi}} Jahre</p>
+                                                            </td>
+                                                        </tr>
+                                                        {{#if this.rate}}
+                                                        <tr><td class="sp-8"></td><td class="sp-8"></td></tr>
+                                                        <tr>
+                                                            <td style="vertical-align:top;width:50%;padding-right:8px;">
+                                                                <p class="meta"><strong>% Rate</strong><br/>{{this.rate}} € / Monat</p>
+                                                            </td>
+                                                            <td style="vertical-align:top;width:50%;padding-left:8px;">
+                                                                <p class="meta"><strong>± Überschuss</strong><br/><span style="color:{{this.uberschussColor}};">{{this.uberschussSign}}{{this.uberschuss}} € / Monat</span></p>
+                                                            </td>
+                                                        </tr>
+                                                        {{/if}}
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr><td class="sp-8"></td></tr>
+                                            {{/if}}
                                             <tr>
                                                 <td colspan="2">
-                                                    <p class="meta"><strong>Address</strong><br/>{{#if this.address}}{{this.address}}{{else}}unknown{{/if}}</p>
+                                                    <p class="meta"><strong>Adresse</strong><br/>{{#if this.address}}{{this.address}}{{else}}–{{/if}}</p>
                                                 </td>
                                             </tr>
                                         </table>
