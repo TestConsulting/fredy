@@ -26,6 +26,7 @@ import {
   Radio,
   RadioGroup,
   Space,
+  Modal,
 } from '@douyinfe/semi-ui-19';
 import {
   IconBriefcase,
@@ -79,6 +80,7 @@ const ListingsGrid = () => {
   const [priceRatingFilter, setPriceRatingFilter] = useSearchParamState(sp, 'rating', null, parseString);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [listingToDelete, setListingToDelete] = useState(null);
+  const [deleteAllModalVisible, setDeleteAllModalVisible] = useState(false);
 
   const loadData = () => {
     actions.listingsData.getListingsData({
@@ -126,6 +128,18 @@ const ListingsGrid = () => {
 
   const handlePageChange = (_page) => {
     setPage(_page);
+  };
+
+  const confirmDeleteAll = async () => {
+    try {
+      await xhrDelete('/api/listings/all', { hardDelete: true });
+      Toast.success('Alle Listings erfolgreich gelöscht');
+      loadData();
+    } catch (error) {
+      Toast.error(error.message || 'Fehler beim Löschen');
+    } finally {
+      setDeleteAllModalVisible(false);
+    }
   };
 
   const confirmDeletion = async (hardDelete) => {
@@ -271,6 +285,10 @@ const ListingsGrid = () => {
             <span style={{ color: '#ff4d4f', fontWeight: 700 }}>HIGH</span>
           </Radio>
         </RadioGroup>
+
+        <Button type="danger" theme="light" icon={<IconDelete />} onClick={() => setDeleteAllModalVisible(true)}>
+          Alle löschen
+        </Button>
       </div>
 
       {visibleListings.length === 0 && (
@@ -476,6 +494,16 @@ const ListingsGrid = () => {
           setListingToDelete(null);
         }}
       />
+      <Modal
+        title="Alle Listings löschen"
+        visible={deleteAllModalVisible}
+        onOk={confirmDeleteAll}
+        onCancel={() => setDeleteAllModalVisible(false)}
+        okText="Ja, alle löschen"
+        okType="danger"
+      >
+        <p>Bist du sicher? Alle Listings werden unwiderruflich aus der Datenbank gelöscht.</p>
+      </Modal>
     </div>
   );
 };
