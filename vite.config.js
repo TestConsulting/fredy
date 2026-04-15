@@ -65,6 +65,7 @@ export default defineConfig({
         ],
       },
       workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
         // Cache the app shell (HTML, JS, CSS)
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg,woff2}'],
         // Network-first for API calls — never cache API responses
