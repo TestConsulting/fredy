@@ -1,0 +1,97 @@
+// ── Desktop modal (Semi UI defaults are fine, minor tweaks) ─────────────────
+.deletionModal {
+  .semi-modal-content {
+    max-width: 500px;
+  }
+}
+
+.deletionModal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 4px;
+}
+
+.deletionModal__message {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.deletionModal__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.deletionModal__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--semi-color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: var(--semi-color-primary-light-active);
+    background: var(--semi-color-primary-light-default);
+  }
+
+  &--selected {
+    border-color: var(--semi-color-primary);
+    background: var(--semi-color-primary-light-default);
+  }
+}
+
+.deletionModal__optionText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.deletionModal__footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+
+  // Desktop: buttons side by side (Cancel left, Confirm right — reverse order)
+  flex-direction: row-reverse;
+
+  .semi-button {
+    flex: 1;
+  }
+}
+
+// ── Mobile: bottom sheet ─────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  // Reposition modal to bottom of screen, full width
+  .semi-modal-wrap:has(.deletionModal) {
+    align-items: flex-end !important;
+  }
+
+  .deletionModal {
+    .semi-modal-content {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      margin: 0 !important;
+      border-radius: 16px 16px 0 0 !important;
+      padding-bottom: env(safe-area-inset-bottom, 12px);
+    }
+  }
+
+  .deletionModal__footer {
+    flex-direction: column; // Stack buttons vertically on mobile
+
+    .semi-button {
+      min-height: 48px; // Larger touch targets
+      font-size: 16px;
+    }
+  }
+
+  .deletionModal__option {
+    padding: 14px; // More touch-friendly
+  }
+}

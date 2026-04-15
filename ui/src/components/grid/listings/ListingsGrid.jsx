@@ -57,6 +57,7 @@ import { useActions, useSelector } from '../../../services/state/store.js';
 import { debounce } from '../../../utils';
 
 import './ListingsGrid.less';
+import '../../ListingDeletionModal.less';
 import { IllustrationNoResult, IllustrationNoResultDark } from '@douyinfe/semi-illustrations';
 
 const { Text } = Typography;
@@ -525,12 +526,22 @@ const ListingsGrid = () => {
       <Modal
         title="Alle Listings löschen"
         visible={deleteAllModalVisible}
-        onOk={confirmDeleteAll}
         onCancel={() => setDeleteAllModalVisible(false)}
-        okText="Ja, alle löschen"
-        okType="danger"
+        footer={null}
+        className="deletionModal"
+        closable
       >
-        <p>Bist du sicher? Alle Listings werden unwiderruflich aus der Datenbank gelöscht.</p>
+        <div className="deletionModal__body">
+          <p>Bist du sicher? Alle Listings werden unwiderruflich aus der Datenbank gelöscht.</p>
+          <div className="deletionModal__footer">
+            <Button type="danger" size="large" block onClick={confirmDeleteAll}>
+              Ja, alle löschen
+            </Button>
+            <Button type="tertiary" size="large" block onClick={() => setDeleteAllModalVisible(false)}>
+              Abbrechen
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

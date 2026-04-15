@@ -4,7 +4,9 @@
  */
 
 import { useState } from 'react';
-import { Modal, Radio, RadioGroup, Typography } from '@douyinfe/semi-ui-19';
+import { Button, Modal, Radio, RadioGroup, Typography } from '@douyinfe/semi-ui-19';
+
+import './ListingDeletionModal.less';
 
 const { Text } = Typography;
 
@@ -23,46 +25,57 @@ const ListingDeletionModal = ({
   };
 
   return (
-    <Modal
-      title={title}
-      visible={visible}
-      onOk={handleOk}
-      onCancel={onCancel}
-      okText="Confirm"
-      cancelText="Cancel"
-      style={{ maxWidth: '500px' }}
-    >
-      <div style={{ marginBottom: 16 }}>
-        <Text>{message}</Text>
-      </div>
-      {showOptions && (
-        <RadioGroup value={deleteType} onChange={(e) => setDeleteType(e.target.value)} style={{ width: '100%' }}>
-          <Radio value="soft" style={{ alignItems: 'flex-start', width: '100%' }}>
-            <div style={{ marginLeft: 8 }}>
-              <Text strong>Mark as deleted (Soft Delete)</Text>
-              <br />
-              <Text type="secondary">
-                Listings are kept in the database but marked as hidden. They will <b>not</b> re-appear during the next
-                scraping session.
-              </Text>
-            </div>
-          </Radio>
-          <Radio value="hard" style={{ marginTop: 16, alignItems: 'flex-start', width: '100%' }}>
-            <div style={{ marginLeft: 8 }}>
-              <Text strong>Remove from database (Hard Delete)</Text>
-              <br />
-              <Text type="secondary">
-                Listings are completely removed from the database.
-                <br />
-                <Text type="warning">
-                  Consequence: They might re-appear when scraping the next time because Fredy won't know they were
-                  previously found.
+    <Modal title={title} visible={visible} onCancel={onCancel} footer={null} className="deletionModal" closable>
+      <div className="deletionModal__body">
+        <Text className="deletionModal__message">{message}</Text>
+
+        {showOptions && (
+          <RadioGroup
+            value={deleteType}
+            onChange={(e) => setDeleteType(e.target.value)}
+            className="deletionModal__options"
+          >
+            <label
+              className={`deletionModal__option${deleteType === 'soft' ? ' deletionModal__option--selected' : ''}`}
+              onClick={() => setDeleteType('soft')}
+            >
+              <Radio value="soft" />
+              <div className="deletionModal__optionText">
+                <Text strong>Mark as deleted (Soft Delete)</Text>
+                <Text type="secondary" size="small">
+                  Listings are kept in the database but hidden. They will <b>not</b> re-appear during the next scraping
+                  session.
                 </Text>
-              </Text>
-            </div>
-          </Radio>
-        </RadioGroup>
-      )}
+              </div>
+            </label>
+
+            <label
+              className={`deletionModal__option${deleteType === 'hard' ? ' deletionModal__option--selected' : ''}`}
+              onClick={() => setDeleteType('hard')}
+            >
+              <Radio value="hard" />
+              <div className="deletionModal__optionText">
+                <Text strong>Remove from database (Hard Delete)</Text>
+                <Text type="secondary" size="small">
+                  Listings are completely removed.{' '}
+                  <Text type="warning" size="small">
+                    They might re-appear on the next scrape.
+                  </Text>
+                </Text>
+              </div>
+            </label>
+          </RadioGroup>
+        )}
+
+        <div className="deletionModal__footer">
+          <Button type="danger" size="large" block onClick={handleOk}>
+            Confirm Delete
+          </Button>
+          <Button type="tertiary" size="large" block onClick={onCancel}>
+            Cancel
+          </Button>
+        </div>
+      </div>
     </Modal>
   );
 };
