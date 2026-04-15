@@ -39,7 +39,7 @@ export default defineConfig({
         name: 'Fredy – Real Estate Finder',
         short_name: 'Fredy',
         description: 'Find and track real estate listings automatically.',
-        theme_color: '#00dc73',
+        theme_color: '#111111',
         background_color: '#000000',
         display: 'standalone',
         orientation: 'portrait',
