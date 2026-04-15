@@ -36,9 +36,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Fredy – Real Estate Finder',
-        short_name: 'Fredy',
-        description: 'Find and track real estate listings automatically.',
+        name: 'AC Immo Invest',
+        short_name: 'AC Immo',
+        description: 'Immobilien-Listings finden und verwalten.',
         theme_color: '#111111',
         background_color: '#000000',
         display: 'standalone',

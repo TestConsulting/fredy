@@ -6,8 +6,8 @@
 import { useEffect, useState } from 'react';
 import { Button, Nav } from '@douyinfe/semi-ui-19';
 import { IconStar, IconSetting, IconTerminal, IconHistogram, IconSidebar, IconMenu } from '@douyinfe/semi-icons';
-import logoWhite from '../../assets/logo_white.png';
-import heart from '../../assets/heart.png';
+import logoFull from '../../assets/Logo_JPG-removebg-preview.png';
+import logoIcon from '../../assets/Logo_Variationen_Grün_beige_Kopie-removebg-preview.png';
 import Logout from '../logout/Logout.jsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -88,7 +88,7 @@ export default function Navigation({ isAdmin }) {
         isCollapsed={collapsed}
         selectedKeys={[activeKey]}
         onSelect={(key) => navigate(key.itemKey)}
-        header={<img src={collapsed ? heart : logoWhite} width={collapsed ? '30' : '120'} alt="Fredy Logo" />}
+        header={<img src={logoIcon} width={collapsed ? '120' : '180'} alt="AC Immo Invest" />}
         footer={
           <Nav.Footer className="navigate__footer">
             <Logout text={!collapsed} />
@@ -124,7 +124,7 @@ export default function Navigation({ isAdmin }) {
           isCollapsed={false}
           selectedKeys={[activeKey]}
           onSelect={(key) => navigate(key.itemKey)}
-          header={<img src={logoWhite} width={120} alt="Fredy Logo" />}
+          header={<img src={logoFull} width={90} className="navigation__drawerLogo" alt="AC Immo Invest" />}
           footer={
             <Nav.Footer className="navigate__footer">
               <Logout text={true} />
