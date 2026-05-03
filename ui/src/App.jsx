@@ -19,7 +19,6 @@ import Jobs from './views/jobs/Jobs';
 import './App.less';
 import TrackingModal from './components/tracking/TrackingModal.jsx';
 import { Banner } from '@douyinfe/semi-ui-19';
-import VersionBanner from './components/version/VersionBanner.jsx';
 import Listings from './views/listings/Listings.jsx';
 import MapView from './views/listings/Map.jsx';
 import Navigation from './components/navigation/Navigation.jsx';
@@ -34,7 +33,6 @@ export default function FredyApp() {
   const actions = useActions();
   const [loading, setLoading] = React.useState(true);
   const currentUser = useSelector((state) => state.user.currentUser);
-  const versionUpdate = useSelector((state) => state.versionUpdate.versionUpdate);
   const settings = useSelector((state) => state.generalSettings.settings);
 
   useEffect(() => {
@@ -75,7 +73,6 @@ export default function FredyApp() {
       </Sider>
       <Layout className="app__main">
         <Content className="app__content">
-          {versionUpdate?.newVersion && <VersionBanner />}
           {settings.demoMode && (
             <>
               <Banner
